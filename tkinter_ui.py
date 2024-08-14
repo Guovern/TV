@@ -3,14 +3,13 @@ from tkinter import messagebox
 from tkinter import scrolledtext
 from tkinter import ttk
 from tkinter import filedialog
-from utils.config import get_config, resource_path
+from utils.config import config, resource_path
 from main import UpdateSource
 import os
 import asyncio
 import threading
 import webbrowser
-
-config = get_config()
+import json
 
 
 class TkinterUI:
@@ -18,7 +17,7 @@ class TkinterUI:
     def __init__(self, root):
         self.root = root
         self.root.title("直播源接口更新工具")
-        self.version = "v1.3.4"
+        self.version = "v1.3.5"
         self.update_source = UpdateSource()
         self.update_running = False
         self.config_entrys = [
@@ -46,7 +45,7 @@ class TkinterUI:
             "domain_blacklist_text",
             "url_keywords_blacklist_text",
             "subscribe_urls_text",
-            "region_list_text",
+            "region_list_combo",
         ]
         self.result_url = None
 
@@ -159,9 +158,7 @@ class TkinterUI:
 
     def update_region_list(self, event):
         config.set(
-            "Settings",
-            "region_list",
-            self.region_list_text.get(1.0, tk.END),
+            "Settings", "region_list", ",".join(self.region_list_combo.selected_values)
         )
 
     def view_result_link_callback(self, event):
@@ -191,17 +188,19 @@ class TkinterUI:
             "open_subscribe": self.open_subscribe_var.get(),
             "subscribe_urls": self.subscribe_urls_text.get(1.0, tk.END),
             "open_multicast": self.open_multicast_var.get(),
-            "region_list": self.region_list_text.get(1.0, tk.END),
+            "region_list": self.region_list_combo.get(),
         }
 
         for key, value in config_values.items():
             config.set("Settings", key, str(value))
         user_config_file = "config/" + (
-            "user_config.ini" if os.path.exists("user_config.ini") else "config.ini"
+            "user_config.ini"
+            if os.path.exists(resource_path("user_config.ini"))
+            else "config.ini"
         )
-        with open(
-            resource_path(user_config_file, persistent=True), "w", encoding="utf-8"
-        ) as configfile:
+        user_config_path = resource_path(user_config_file, persistent=True)
+        os.makedirs(os.path.dirname(user_config_path), exist_ok=True)
+        with open(user_config_path, "w", encoding="utf-8") as configfile:
             config.write(configfile)
         messagebox.showinfo("提示", "保存成功")
 
@@ -654,12 +653,26 @@ class TkinterUI:
 
         self.region_list_label = tk.Label(frame4_region_list, text="组播地区:", width=9)
         self.region_list_label.pack(side=tk.LEFT, padx=4, pady=8)
-        self.region_list_text = scrolledtext.ScrolledText(frame4_region_list, height=5)
-        self.region_list_text.pack(
+        with open(
+            resource_path("updates/multicast/multicast_map.json"), "r", encoding="utf-8"
+        ) as f:
+            regions_obj = json.load(f)
+            regions = list(regions_obj.keys())
+        region_selected_values = [
+            value
+            for value in config.get("Settings", "region_list").split(",")
+            if value.strip()
+        ]
+        self.region_list_combo = MultiSelectCombobox(
+            frame4_region_list,
+            values=regions,
+            selected_values=region_selected_values,
+            height=10,
+        )
+        self.region_list_combo.pack(
             side=tk.LEFT, padx=4, pady=8, expand=True, fill=tk.BOTH
         )
-        self.region_list_text.insert(tk.END, config.get("Settings", "region_list"))
-        self.region_list_text.bind("<KeyRelease>", self.update_region_list)
+        self.region_list_combo.bind("<KeyRelease>", self.update_region_list)
 
         root_operate = tk.Frame(self.root)
         root_operate.pack(fill=tk.X, pady=8, padx=120)
@@ -720,6 +733,30 @@ class TkinterUI:
             self.view_result_link_callback,
         )
         self.view_result_link.pack_forget()
+
+
+class MultiSelectCombobox(ttk.Combobox):
+    def __init__(self, master=None, **kwargs):
+        selected_values = kwargs.pop("selected_values", [])
+        values = kwargs.pop("values", [])
+        super().__init__(master, **kwargs)
+        self.selected_values = selected_values
+        self.values = values
+        self["values"] = self.values
+        self.bind("<<ComboboxSelected>>", self.on_select)
+        self.update_values()
+
+    def on_select(self, event):
+        selected_value = self.get().strip()
+        if selected_value in self.selected_values:
+            self.selected_values.remove(selected_value)
+        else:
+            self.selected_values.append(selected_value)
+        self.update_values()
+
+    def update_values(self):
+        display_text = ",".join(self.selected_values)
+        self.set(display_text)
 
 
 if __name__ == "__main__":
