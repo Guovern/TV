@@ -1,12 +1,11 @@
 import asyncio
 from utils.config import config
+import utils.constants as constants
 from utils.channel import (
     get_channel_items,
     append_total_data,
     process_sort_channel_list,
     write_channel_to_file,
-    setup_logging,
-    cleanup_logging,
     get_channel_data_cache_with_compare,
     format_channel_url_info,
 )
@@ -20,6 +19,8 @@ from utils.tools import (
     format_interval,
     check_ipv6_support,
     resource_path,
+    setup_logging,
+    cleanup_logging,
 )
 from updates.subscribe import get_channels_by_subscribe_urls
 from updates.multicast import get_channels_by_multicast
@@ -28,7 +29,6 @@ from updates.fofa import get_channels_by_fofa
 from updates.online_search import get_channels_by_online_search
 import os
 from tqdm import tqdm
-from tqdm.asyncio import tqdm_asyncio
 from time import time
 from flask import Flask, render_template_string
 import sys
@@ -56,8 +56,11 @@ def show_log():
     user_log_file = "output/" + (
         "user_result.log" if os.path.exists("config/user_config.ini") else "result.log"
     )
-    with open(user_log_file, "r", encoding="utf-8") as file:
-        content = file.read()
+    if os.path.exists(user_log_file):
+        with open(user_log_file, "r", encoding="utf-8") as file:
+            content = file.read()
+    else:
+        content = constants.waiting_tip
     return render_template_string(
         "<head><link rel='icon' href='{{ url_for('static', filename='images/favicon.ico') }}' type='image/x-icon'></head><pre>{{ content }}</pre>",
         content=content,
@@ -169,8 +172,8 @@ class UpdateSource:
                         0,
                     )
                     self.start_time = time()
-                    self.pbar = tqdm_asyncio(total=self.total, desc="Sorting")
-                    self.channel_data = await process_sort_channel_list(
+                    self.pbar = tqdm(total=self.total, desc="Sorting")
+                    self.channel_data = process_sort_channel_list(
                         self.channel_data,
                         ipv6=ipv6_support,
                         callback=sort_callback,
@@ -224,8 +227,6 @@ class UpdateSource:
                     True,
                     url=f"{get_ip_address()}" if open_service else None,
                 )
-            if open_service:
-                run_service()
         except asyncio.exceptions.CancelledError:
             print("Update cancelled!")
 
@@ -253,14 +254,23 @@ def scheduled_task():
 
 
 def run_service():
-    if not os.environ.get("GITHUB_ACTIONS"):
-        ip_address = get_ip_address()
-        print(f"📄 Result detail: {ip_address}/result")
-        print(f"📄 Log detail: {ip_address}/log")
-        print(f"✅ You can use this url to watch IPTV 📺: {ip_address}")
-        app.run(host="0.0.0.0", port=8000)
+    try:
+        if not os.environ.get("GITHUB_ACTIONS"):
+            ip_address = get_ip_address()
+            print(f"📄 Result detail: {ip_address}/result")
+            print(f"📄 Log detail: {ip_address}/log")
+            print(f"✅ You can use this url to watch IPTV 📺: {ip_address}")
+            app.run(host="0.0.0.0", port=8000)
+    except Exception as e:
+        print(f"❌ Service start failed: {e}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1] == "scheduled_task"):
-        scheduled_task()
+    if len(sys.argv) == 1 and config.open_service:
+        loop = asyncio.new_event_loop()
+
+        async def run_service_async():
+            loop.run_in_executor(None, run_service)
+
+        asyncio.run(run_service_async())
+    scheduled_task()

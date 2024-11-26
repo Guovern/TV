@@ -23,7 +23,7 @@ Since this project will continue to iterate and improve, if you want to get the 
 
 ### 1. Star
 
-Go to https://github.com/Guovin/TV, click on Star to bookmark this project (Your Star is my motivation to keep updating).
+Go to https://github.com/Guovin/IPTV, click on Star to bookmark this project (Your Star is my motivation to keep updating).
 ![Star](./images/star.png 'Star')
 
 ### 2. Watch
@@ -165,20 +165,27 @@ If you want to perform updates every 2 days, you can modify it like this:
 
 ### Method 2: Command Line
 
-```python
 1. Install Python
-Please download and install Python from the official site. During installation, choose to add Python to the system's environment variables Path.
+   Please download and install Python from the official site. During installation, choose to add Python to the system's environment variables Path.
 
 2. Run Update
-Open a CMD terminal in the project directory and run the following commands in sequence:
+   Open a CMD terminal in the project directory and run the following commands in sequence:
+
+```python
 pip install pipenv
-pipenv install
-pipenv run build
+```
+
+```python
+pipenv install --dev
+```
+
+```python
+pipenv run dev
 ```
 
 ### Method 3: GUI Software
 
-1. Download the update tool software, open the software, click update to complete the update.
+1. Download [IPTV update software](https://github.com/Guovin/IPTV/releases), open the software, click update to complete the update.
 
 2. Alternatively, run the following command in the project directory to open the GUI software:
 
@@ -186,37 +193,65 @@ pipenv run build
 pipenv run ui
 ```
 
-![Update tool software](./images/ui.png 'Update tool software')
+![IPTV update software](./images/ui.png 'IPTV update software')
 
 ### Method 4: Docker
 
-- requests: Lightweight, low performance requirements, fast update speed, stability uncertain (recommend this version for subscription sources)
-- driver: Higher performance requirements, slower update speed, high stability and success rate. Set open_driver = False to switch to the request version (recommended for hotel sources, multicast sources, and keyword search)
+- iptv (Full version): Higher performance requirements, slower update speed, high stability and success rate. Set open_driver = False to switch to the lite running mode (recommended for hotel sources, multicast sources, and online searches)
+- iptv:lite (Condensed version): Lightweight, low performance requirements, fast update speed, stability uncertain (recommend using this version for the subscription source)
+
+It's recommended to try each one and choose the version that suits you
+
+1. Pull the image:
+
+- iptv
 
 ```bash
-1. Pull the image:
-For requests version:
-docker pull guovern/tv-requests:latest
+docker pull guovern/iptv:latest
+```
 
-For driver version:
-docker pull guovern/tv-driver:latest
+- iptv:lite
+
+```bash
+docker pull guovern/iptv:lite
+```
 
 2. Run the container:
-docker run -d -p 8000:8000 guovern/tv-requests or driver
+
+- iptv
+
+```bash
+docker run -d -p 8000:8000 guovern/iptv
+```
+
+- iptv:lite
+
+```bash
+docker run -d -p 8000:8000 guovern/iptv:lite
+```
 
 Volume Mount Parameter (Optional):
 This allows synchronization of files between the host machine and the container. Modifying templates, configurations, and retrieving updated result files can be directly operated in the host machine's folder.
 
-config:
--v <path>/config:/tv-requests/config or tv-driver/config
+Taking the host path /etc/docker as an example:
 
-result:
--v <path>/output:/tv-requests/output or tv-driver/output
+- iptv：
 
-3. Check the update results: Visit (domain:8000)
+```bash
+docker run -v /etc/docker/config:/iptv/config -v /etc/docker/output:/iptv/output -d -p 8000:8000 guovern/iptv
 ```
 
-#### Note: Link to the result file after updates of methods one to three: http://local ip:8000 or http://localhost:8000
+- iptv:lite：
+
+```bash
+docker run -v /etc/docker/config:/iptv_lite/config -v /etc/docker/output:/iptv_lite/output -d -p 8000:8000 guovern/iptv:lite
+```
+
+3. Update results:
+
+- API address: ip:8000
+- API details: ip:8000/result
+- Speed test log: ip:8000/log
 
 ### Update the File to the Repository(optional)
 
