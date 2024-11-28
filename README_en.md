@@ -135,8 +135,16 @@ pip install pipenv
 pipenv install --dev
 ```
 
+Start update:
+
 ```python
 pipenv run dev
+```
+
+Start service:
+
+```python
+pipenv run service
 ```
 
 ### Method 3: GUI Software
@@ -206,7 +214,9 @@ docker run -v /etc/docker/config:/iptv_lite/config -v /etc/docker/output:/iptv_l
 3. Update results:
 
 - API address: ip:8000
-- API details: ip:8000/result
+- M3u api：ip:8000/m3u
+- Txt api：ip:8000/txt
+- API content: ip:8000/content
 - Speed test log: ip:8000/log
 
 ## 🗓️ Changelog

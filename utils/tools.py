@@ -15,35 +15,20 @@ import sys
 import logging
 from logging.handlers import RotatingFileHandler
 
-handler = None
 
-
-def setup_logging():
+def get_logger(path, level=logging.ERROR, init=False):
     """
-    Setup logging
+    get the logger
     """
-    global handler
     if not os.path.exists(constants.output_dir):
         os.makedirs(constants.output_dir)
-    handler = RotatingFileHandler(constants.log_path, encoding="utf-8")
-    logging.basicConfig(
-        handlers=[handler],
-        format="%(message)s",
-        level=logging.INFO,
-    )
-
-
-def cleanup_logging():
-    """
-    Cleanup logging
-    """
-    global handler
-    if handler:
-        for handler in logging.root.handlers[:]:
-            handler.close()
-            logging.root.removeHandler(handler)
-    if os.path.exists(constants.log_path):
-        os.remove(constants.log_path)
+    if init and os.path.exists(path):
+        os.remove(path)
+    handler = RotatingFileHandler(path, encoding="utf-8")
+    logger = logging.getLogger(path)
+    logger.addHandler(handler)
+    logger.setLevel(level)
+    return logger
 
 
 def format_interval(t):
@@ -410,18 +395,25 @@ def convert_to_m3u():
             print(f"✅ Result m3u file generated at: {m3u_file_path}")
 
 
-def get_result_file_content(show_result=False):
+def get_result_file_content(show_content=False, file_type=None):
     """
     Get the content of the result file
     """
     user_final_file = resource_path(config.final_file)
-    if os.path.exists(user_final_file):
-        if config.open_m3u_result:
-            user_final_file = os.path.splitext(user_final_file)[0] + ".m3u"
-            if show_result == False:
-                return send_file(user_final_file, as_attachment=True)
-        with open(user_final_file, "r", encoding="utf-8") as file:
-            content = file.read()
+    result_file = (
+        os.path.splitext(user_final_file)[0] + f".{file_type}"
+        if file_type
+        else user_final_file
+    )
+    if os.path.exists(result_file):
+        if file_type == "txt" or not config.open_m3u_result:
+            with open(result_file, "r", encoding="utf-8") as file:
+                content = file.read()
+        elif config.open_m3u_result:
+            if not file_type:
+                result_file = os.path.splitext(user_final_file)[0] + ".m3u"
+            if show_content == False:
+                return send_file(result_file, as_attachment=True)
     else:
         content = constants.waiting_tip
     return render_template_string(
@@ -483,7 +475,7 @@ def add_url_info(url, info):
     Add url info to the URL
     """
     if info:
-        separator = "|" if "$" in url else "$"
+        separator = "-" if "$" in url else "$"
         url += f"{separator}{info}"
     return url
 
@@ -500,7 +492,7 @@ def remove_cache_info(str):
     """
     Remove the cache info from the string
     """
-    return re.sub(r"cache:.*|\|cache:.*", "", str)
+    return re.sub(r"[^a-zA-Z\u4e00-\u9fa5\$]?cache:.*", "", str)
 
 
 def resource_path(relative_path, persistent=False):

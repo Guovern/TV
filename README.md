@@ -135,8 +135,16 @@ pip install pipenv
 pipenv install --dev
 ```
 
+启动更新：
+
 ```python
 pipenv run dev
+```
+
+启动服务：
+
+```python
+pipenv run service
 ```
 
 ### 方式三：GUI 软件
@@ -204,7 +212,9 @@ docker run -v /etc/docker/config:/iptv_lite/config -v /etc/docker/output:/iptv_l
 3. 更新结果：
 
 - 接口地址：ip:8000
-- 接口详情：ip:8000/result
+- M3u 接口：ip:8000/m3u
+- Txt 接口：ip:8000/txt
+- 接口内容：ip:8000/content
 - 测速日志：ip:8000/log
 
 ## 🗓️ 更新日志
