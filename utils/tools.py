@@ -392,7 +392,7 @@ def convert_to_m3u():
             m3u_file_path = os.path.splitext(user_final_file)[0] + ".m3u"
             with open(m3u_file_path, "w", encoding="utf-8") as m3u_file:
                 m3u_file.write(m3u_output)
-            print(f"✅ Result m3u file generated at: {m3u_file_path}")
+            print(f"✅ M3U result file generated at: {m3u_file_path}")
 
 
 def get_result_file_content(show_content=False, file_type=None):
@@ -406,14 +406,13 @@ def get_result_file_content(show_content=False, file_type=None):
         else user_final_file
     )
     if os.path.exists(result_file):
-        if file_type == "txt" or not config.open_m3u_result:
-            with open(result_file, "r", encoding="utf-8") as file:
-                content = file.read()
-        elif config.open_m3u_result:
-            if not file_type:
+        if config.open_m3u_result:
+            if file_type == "m3u" or not file_type:
                 result_file = os.path.splitext(user_final_file)[0] + ".m3u"
-            if show_content == False:
+            if file_type != "txt" and show_content == False:
                 return send_file(result_file, as_attachment=True)
+        with open(result_file, "r", encoding="utf-8") as file:
+            content = file.read()
     else:
         content = constants.waiting_tip
     return render_template_string(

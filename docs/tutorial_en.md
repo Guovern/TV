@@ -23,7 +23,7 @@ Since this project will continue to iterate and improve, if you want to get the 
 
 ### 1. Star
 
-Go to https://github.com/Guovin/IPTV, click on Star to bookmark this project (Your Star is my motivation to keep updating).
+Go to https://github.com/Guovin/iptv-api, click on Star to bookmark this project (Your Star is my motivation to keep updating).
 ![Star](./images/star.png 'Star')
 
 ### 2. Watch
@@ -146,11 +146,11 @@ https://mirror.ghproxy.com/raw.githubusercontent.com/your github username/reposi
 
 If you can access this link and it returns the updated interface content, then your live source interface link has been successfully created! Simply copy and paste this link into software like TVBox in the configuration field to use~
 
-- Note: Except for the first execution of the workflow, which requires you to manually trigger it, subsequent executions (default: daily at 6:00 am and 18:00 pm Beijing time) will be automatically triggered. If you have modified the template or configuration files and want to execute the update immediately, you can manually trigger (2) Run workflow.
+- Note: Except for the first execution of the workflow, which requires you to manually trigger it, subsequent executions (default: 6:00 AM and 18:00 PM Beijing time daily) will be automatically triggered. If you have modified the template or configuration files and want to execute the update immediately, you can manually trigger (2) Run workflow.
 
 ### 4.Modify Workflow Update Frequency(optional)
 
-If you want to modify the update frequency (default: daily at 6:00 am and 18:00 pm Beijing time), you can modify the on:schedule:- cron field.
+If you want to modify the update frequency (default: 6:00 AM and 18:00 PM Beijing time daily), you can modify the on:schedule:- cron field.
 ![.github/workflows/main.yml](./images/schedule-cron.png '.github/workflows/main.yml')
 If you want to perform updates every 2 days, you can modify it like this:
 
@@ -159,7 +159,7 @@ If you want to perform updates every 2 days, you can modify it like this:
 - cron: '0 10 */2 * *'
 ```
 
-#### 1. It is strongly discouraged to make modifications, as there is no difference in the content of the interface in a short period of time. Both too frequent updates and high-consumption running workflows may be judged as resource abuse, leading to the risk of the repository and account being banned.
+#### 1. It is strongly not recommended to modify and update too frequently, because the interface content does not differ within a short period of time, and too high update frequency and time-consuming workflow may be judged as resource abuse, resulting in the risk of warehouse and account being blocked.
 
 #### 2. Please pay attention to the runtime of your workflow. If you find that the execution time is too long, you need to appropriately reduce the number of channels in the template, modify the number of pages and interfaces in the configuration, in order to meet the compliant operation requirements.
 
@@ -193,7 +193,7 @@ pipenv run service
 
 ### Method 3: GUI Software
 
-1. Download [IPTV update software](https://github.com/Guovin/IPTV/releases), open the software, click update to complete the update.
+1. Download [IPTV-API software](https://github.com/Guovin/iptv-api/releases), open the software, click update to complete the update.
 
 2. Alternatively, run the following command in the project directory to open the GUI software:
 
@@ -201,41 +201,41 @@ pipenv run service
 pipenv run ui
 ```
 
-![IPTV update software](./images/ui.png 'IPTV update software')
+![IPTV-API software](./images/ui.png 'IPTV-API software')
 
 ### Method 4: Docker
 
-- iptv (Full version): Higher performance requirements, slower update speed, high stability and success rate. Set open_driver = False to switch to the lite running mode (recommended for hotel sources, multicast sources, and online searches)
-- iptv:lite (Condensed version): Lightweight, low performance requirements, fast update speed, stability uncertain (recommend using this version for the subscription source)
+- iptv-api (Full version): Higher performance requirements, slower update speed, high stability and success rate. Set open_driver = False to switch to the lite running mode (recommended for hotel sources, multicast sources, and online searches)
+- iptv-api:lite (Condensed version): Lightweight, low performance requirements, fast update speed, stability uncertain (recommend using this version for the subscription source)
 
 It's recommended to try each one and choose the version that suits you
 
 1. Pull the image:
 
-- iptv
+- iptv-api
 
 ```bash
-docker pull guovern/iptv:latest
+docker pull guovern/iptv-api:latest
 ```
 
-- iptv:lite
+- iptv-api:lite
 
 ```bash
-docker pull guovern/iptv:lite
+docker pull guovern/iptv-api:lite
 ```
 
 2. Run the container:
 
-- iptv
+- iptv-api
 
 ```bash
-docker run -d -p 8000:8000 guovern/iptv
+docker run -d -p 8000:8000 guovern/iptv-api
 ```
 
-- iptv:lite
+- iptv-api:lite
 
 ```bash
-docker run -d -p 8000:8000 guovern/iptv:lite
+docker run -d -p 8000:8000 guovern/iptv-api:lite
 ```
 
 Volume Mount Parameter (Optional):
@@ -243,22 +243,24 @@ This allows synchronization of files between the host machine and the container.
 
 Taking the host path /etc/docker as an example:
 
-- iptv：
+- iptv-api：
 
 ```bash
-docker run -v /etc/docker/config:/iptv/config -v /etc/docker/output:/iptv/output -d -p 8000:8000 guovern/iptv
+docker run -v /etc/docker/config:/iptv-api/config -v /etc/docker/output:/iptv-api/output -d -p 8000:8000 guovern/iptv-api
 ```
 
-- iptv:lite：
+- iptv-api:lite：
 
 ```bash
-docker run -v /etc/docker/config:/iptv_lite/config -v /etc/docker/output:/iptv_lite/output -d -p 8000:8000 guovern/iptv:lite
+docker run -v /etc/docker/config:/iptv-api-lite/config -v /etc/docker/output:/iptv-api-lite/output -d -p 8000:8000 guovern/iptv-api:lite
 ```
 
 3. Update results:
 
 - API address: ip:8000
-- API details: ip:8000/result
+- M3u api：ip:8000/m3u
+- Txt api：ip:8000/txt
+- API content: ip:8000/content
 - Speed test log: ip:8000/log
 
 ### Update the File to the Repository(optional)
