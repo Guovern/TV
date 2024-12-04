@@ -44,8 +44,8 @@ RUN if [ "$LITE" = False ]; then apt-get install -y --no-install-recommends chro
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN (crontab -l ; \
-  echo "0 22 * * * python $APP_WORKDIR/main.py &"; \
-  echo "0 10 * * * python $APP_WORKDIR/main.py &") | crontab -
+  echo "0 22 * * * cd $APP_WORKDIR && /.venv/bin/python main.py"; \
+  echo "0 10 * * * cd $APP_WORKDIR && /.venv/bin/python main.py") | crontab -
 
 EXPOSE 8000
 

@@ -72,7 +72,7 @@
     <img src="https://img.shields.io/github/downloads/guovin/iptv-api/total" />
   </a>
   <a href="https://hub.docker.com/repository/docker/guovern/iptv-api">
-    <img src="https://img.shields.io/docker/pulls/guovern/iptv-api" />
+    <img src="https://img.shields.io/docker/pulls/guovern/iptv-api?label=docker:iptv-api" />
   </a>
   <a href="https://hub.docker.com/repository/docker/guovern/tv-requests">
     <img src="https://img.shields.io/docker/pulls/guovern/tv-requests?label=docker:requests" />
@@ -86,6 +86,17 @@
 </p>
 
 [中文](./README.md) | English
+
+- [✅ Features](#✅-features)
+- [🔗 Latest results](#🔗-latest-results)
+- [⚙️ Config parameter](./docs/config_en.md)
+- [🚀 Quick Start](#🚀-quick-start)
+- [📖 Detailed Tutorial](./docs/tutorial_en.md)
+- [🗓️ Changelog](./CHANGELOG.md)
+- [💰️ Appreciate](#💰️-appreciate)
+- [👀 Follow](#👀-follow)
+- [📣 Disclaimer](#📣-disclaimer)
+- [⚖️ License](#⚖️-license)
 
 ## ✅ Features
 
@@ -102,17 +113,17 @@
 - Interface source:
 
 ```bash
-https://ghproxy.net/raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u
+https://ghp.ci/raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u
 ```
 
 ```bash
-https://ghproxy.net/raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt
+https://ghp.ci/raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.txt
 ```
 
 - Data source:
 
 ```bash
-https://ghproxy.net/raw.githubusercontent.com/Guovin/iptv-api/gd/source.json
+https://ghp.ci/raw.githubusercontent.com/Guovin/iptv-api/gd/source.json
 ```
 
 ## ⚙️ Config
